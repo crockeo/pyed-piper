@@ -6,16 +6,22 @@ from lib.notes import notes
 
 VOLUME = 0.5
 SAMPLE_RATE = 44100
-DURATION = 1
+DURATION = 5
 
 
 class ToneGenerator:
-    def __init__(self, frequency: float):
+    def __init__(self, frequency: float, velocity: float):
         self.frequency = frequency
+        self.velocity = velocity
 
     def generate_tone(self) -> np.ndarray:
         return np.sin(
-            2 * np.pi * np.arange(SAMPLE_RATE * DURATION) * self.frequency / SAMPLE_RATE
+            self.velocity
+            * 2
+            * np.pi
+            * np.arange(SAMPLE_RATE * DURATION)
+            * self.frequency
+            / SAMPLE_RATE
         ).astype(np.float32)
 
 
@@ -33,11 +39,13 @@ class CompositeToneGenerator:
 
 
 class OverToneGenerator:
-    def  __init__(self, base_frequency: float):
-        self.composite = CompositeToneGenerator([
-            ToneGenerator(base_frequency * (1 + overtone))
-            for overtone in range(7)
-        ])
+    def __init__(self, base_frequency: float):
+        self.composite = CompositeToneGenerator(
+            [
+                ToneGenerator(base_frequency * (1 + overtone), 1 / (1 + overtone))
+                for overtone in range(7)
+            ]
+        )
 
     def generate_tone(self) -> np.ndarray:
         return self.composite.generate_tone()
