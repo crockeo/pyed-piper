@@ -1,66 +1,20 @@
 import pyaudio
-import numpy as np
 from typing import List
 
 from lib.notes import notes
+from lib.wave_generators import generate_sine_wave
 
 VOLUME = 0.5
 SAMPLE_RATE = 44100
-DURATION = 5
-
-
-class ToneGenerator:
-    def __init__(self, frequency: float, velocity: float):
-        self.frequency = frequency
-        self.velocity = velocity
-
-    def generate_tone(self) -> np.ndarray:
-        return np.sin(
-            self.velocity
-            * 2
-            * np.pi
-            * np.arange(SAMPLE_RATE * DURATION)
-            * self.frequency
-            / SAMPLE_RATE
-        ).astype(np.float32)
-
-
-class CompositeToneGenerator:
-    def __init__(self, tone_generators: List[ToneGenerator]):
-        self.tone_generators = tone_generators
-
-    def generate_tone(self) -> np.ndarray:
-        sample = np.zeros(int(SAMPLE_RATE * DURATION))
-        for tone_generator in self.tone_generators:
-            tone = tone_generator.generate_tone()
-            sample += tone
-        sample /= len(self.tone_generators)
-        return sample.astype(np.float32)
-
-
-class OverToneGenerator:
-    def __init__(self, base_frequency: float):
-        self.composite = CompositeToneGenerator(
-            [
-                ToneGenerator(base_frequency * (1 + overtone), 1 / (1 + overtone))
-                for overtone in range(7)
-            ]
-        )
-
-    def generate_tone(self) -> np.ndarray:
-        return self.composite.generate_tone()
+DURATION = 4
 
 
 def main():
-    chord = CompositeToneGenerator(
-        [
-            OverToneGenerator(notes["A4"]),
-            OverToneGenerator(notes["B4"]),
-            OverToneGenerator(notes["C5"]),
-        ]
+    sample = generate_sine_wave(
+        DURATION, SAMPLE_RATE, notes["A3"], 1.0,
+    ) + generate_sine_wave(
+        DURATION, SAMPLE_RATE, notes["C4"], 1.0,
     )
-
-    sample = chord.generate_tone()
 
     audio_instance = pyaudio.PyAudio()
     stream = audio_instance.open(
