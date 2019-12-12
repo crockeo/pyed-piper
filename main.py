@@ -2,9 +2,11 @@ import pyaudio
 import numpy as np
 from typing import List
 
+from lib.notes import notes
+
 VOLUME = 0.5
 SAMPLE_RATE = 44100
-DURATION = 5
+DURATION = 1
 
 
 class ToneGenerator:
@@ -44,9 +46,9 @@ class OverToneGenerator:
 def main():
     chord = CompositeToneGenerator(
         [
-            OverToneGenerator(440),  # A4
-            OverToneGenerator(493.88),  # B4
-            OverToneGenerator(523.25),  # C5
+            OverToneGenerator(notes["A4"]),
+            OverToneGenerator(notes["B4"]),
+            OverToneGenerator(notes["C5"]),
         ]
     )
 
