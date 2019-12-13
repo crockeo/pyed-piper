@@ -1,9 +1,11 @@
 import keyboard
 import pyaudio
+import time
 from typing import List
 
 from lib.notes import notes
 from lib.wave_generators import generate_sine_wave
+from lib.wave_generators import generate_sine_wave_frame
 
 VOLUME = 0.5
 SAMPLE_RATE = 44100
@@ -21,25 +23,41 @@ hotkeys = {
     "8": "A4",
 }
 
+frame_start = 0
+
+def audio_callback(in_data, frame_count, time_info, status):
+    global frame_start
+
+    sine_wave = generate_sine_wave_frame(
+        frame_start,
+        frame_start + frame_count,
+        SAMPLE_RATE,
+        440.0,
+        0.1,
+    )
+
+    frame_start += frame_count
+
+    return (
+        sine_wave,
+        pyaudio.paContinue,
+    )
+
 
 def main():
     audio_instance = pyaudio.PyAudio()
     stream = audio_instance.open(
-        format=pyaudio.paFloat32, channels=1, rate=SAMPLE_RATE, output=True
+        format=pyaudio.paFloat32,
+        channels=1,
+        rate=SAMPLE_RATE,
+        output=True,
+        stream_callback=audio_callback,
     )
 
-    samples = {}
-    for key in hotkeys:
-        samples[key] = generate_sine_wave(
-            DURATION, SAMPLE_RATE, notes[hotkeys[key]], 1.0
-        )
+    stream.start_stream()
 
-        keyboard.add_hotkey(key, lambda k: stream.write(samples[k]), args=(key), suppress=True)
-
-    try:
+    while stream.is_active():
         keyboard.wait()
-    except KeyboardInterrupt:
-        pass
 
     stream.stop_stream()
     stream.close()
