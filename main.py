@@ -1,5 +1,6 @@
 import keyboard
 import pyaudio
+import numpy as np
 import time
 from typing import List
 
@@ -28,18 +29,21 @@ frame_start = 0
 def audio_callback(in_data, frame_count, time_info, status):
     global frame_start
 
-    sine_wave = generate_sine_wave_frame(
-        frame_start,
-        frame_start + frame_count,
-        SAMPLE_RATE,
-        440.0,
-        0.1,
-    )
+    wave = np.zeros(frame_count)
+    for hotkey in hotkeys:
+        if keyboard.is_pressed(hotkey):
+            wave += generate_sine_wave_frame(
+                frame_start,
+                frame_start + frame_count,
+                SAMPLE_RATE,
+                notes[hotkeys[hotkey]],
+                0.5,
+            )
 
     frame_start += frame_count
 
     return (
-        sine_wave,
+        wave.astype(np.float32),
         pyaudio.paContinue,
     )
 
