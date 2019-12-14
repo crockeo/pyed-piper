@@ -4,6 +4,7 @@ import numpy as np
 import time
 from typing import List
 
+from lib.driver import ToneDriver
 from lib.notes import notes
 from lib.wave_generators import generate_overtone_sine_wave_frame
 
@@ -12,33 +13,34 @@ SAMPLE_RATE = 44100
 DURATION = 1
 
 
-hotkeys = {
-    "1": "A3",
-    "2": "B3",
-    "3": "C4",
-    "4": "D4",
-    "5": "E4",
-    "6": "F4",
-    "7": "G4",
-    "8": "A4",
+drivers = {
+    "1": ToneDriver(SAMPLE_RATE, notes["A3"], 1),
+    "2": ToneDriver(SAMPLE_RATE, notes["B3"], 1),
+    "3": ToneDriver(SAMPLE_RATE, notes["C4"], 1),
+    "4": ToneDriver(SAMPLE_RATE, notes["D4"], 1),
+    "5": ToneDriver(SAMPLE_RATE, notes["E4"], 1),
+    "6": ToneDriver(SAMPLE_RATE, notes["F4"], 1),
+    "7": ToneDriver(SAMPLE_RATE, notes["G4"], 1),
+    "8": ToneDriver(SAMPLE_RATE, notes["A4"], 1),
 }
 
 frame_start = 0
 
+
 def audio_callback(in_data, frame_count, time_info, status):
+    global drivers
     global frame_start
 
+    time = frame_start / SAMPLE_RATE
+
     wave = np.zeros(frame_count)
-    for hotkey in hotkeys:
-        if keyboard.is_pressed(hotkey):
-            wave += generate_overtone_sine_wave_frame(
-                frame_start,
-                frame_start + frame_count,
-                SAMPLE_RATE,
-                notes[hotkeys[hotkey]],
-                0.5,
-                2,
-            )
+    for (key, driver) in drivers.items():
+        if keyboard.is_pressed(key) and not driver.is_running():
+            driver.start(time)
+        if not keyboard.is_pressed(key) and driver.is_running():
+            driver.stop()
+
+        wave += driver.generate_frame(time, frame_count)
 
     frame_start += frame_count
 
