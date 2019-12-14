@@ -5,8 +5,7 @@ import time
 from typing import List
 
 from lib.notes import notes
-from lib.wave_generators import generate_sine_wave
-from lib.wave_generators import generate_sine_wave_frame
+from lib.wave_generators import generate_overtone_sine_wave_frame
 
 VOLUME = 0.5
 SAMPLE_RATE = 44100
@@ -32,12 +31,13 @@ def audio_callback(in_data, frame_count, time_info, status):
     wave = np.zeros(frame_count)
     for hotkey in hotkeys:
         if keyboard.is_pressed(hotkey):
-            wave += generate_sine_wave_frame(
+            wave += generate_overtone_sine_wave_frame(
                 frame_start,
                 frame_start + frame_count,
                 SAMPLE_RATE,
                 notes[hotkeys[hotkey]],
                 0.5,
+                2,
             )
 
     frame_start += frame_count
