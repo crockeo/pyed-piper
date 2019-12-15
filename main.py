@@ -4,7 +4,7 @@ import numpy as np
 import time
 from typing import List
 
-from lib.driver import ToneDriver
+from lib.driver import OverToneDriver
 from lib.notes import notes
 from lib.wave_generators import generate_overtone_sine_wave_frame
 
@@ -14,14 +14,14 @@ DURATION = 1
 
 
 drivers = {
-    "1": ToneDriver(SAMPLE_RATE, notes["A3"], 1),
-    "2": ToneDriver(SAMPLE_RATE, notes["B3"], 1),
-    "3": ToneDriver(SAMPLE_RATE, notes["C4"], 1),
-    "4": ToneDriver(SAMPLE_RATE, notes["D4"], 1),
-    "5": ToneDriver(SAMPLE_RATE, notes["E4"], 1),
-    "6": ToneDriver(SAMPLE_RATE, notes["F4"], 1),
-    "7": ToneDriver(SAMPLE_RATE, notes["G4"], 1),
-    "8": ToneDriver(SAMPLE_RATE, notes["A4"], 1),
+    "1": OverToneDriver(SAMPLE_RATE, notes["A3"], 1, 8),
+    "2": OverToneDriver(SAMPLE_RATE, notes["B3"], 1, 8),
+    "3": OverToneDriver(SAMPLE_RATE, notes["C4"], 1, 8),
+    "4": OverToneDriver(SAMPLE_RATE, notes["D4"], 1, 8),
+    "5": OverToneDriver(SAMPLE_RATE, notes["E4"], 1, 8),
+    "6": OverToneDriver(SAMPLE_RATE, notes["F4"], 1, 8),
+    "7": OverToneDriver(SAMPLE_RATE, notes["G4"], 1, 8),
+    "8": OverToneDriver(SAMPLE_RATE, notes["A4"], 1, 8),
 }
 
 frame_start = 0
@@ -62,8 +62,10 @@ def main():
 
     stream.start_stream()
 
-    while stream.is_active():
+    try:
         keyboard.wait()
+    except KeyboardInterrupt:
+        pass
 
     stream.stop_stream()
     stream.close()

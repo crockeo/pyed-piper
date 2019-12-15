@@ -81,3 +81,33 @@ class ToneDriver(BaseDriver):
                 self.zeroed = True
 
         return wave.astype(np.float32)
+
+
+class OverToneDriver(BaseDriver):
+    def __init__(
+        self, sample_rate: float, frequency: float, amplitude: float, degree: float
+    ):
+        self.sub_drivers = [
+            ToneDriver(sample_rate, frequency, amplitude / (d + 1))
+            for d in range(degree)
+        ]
+
+    def start(self, time: float):
+        for sub_driver in self.sub_drivers:
+            sub_driver.start(time)
+
+    def stop(self):
+        for sub_driver in self.sub_drivers:
+            sub_driver.stop()
+
+    def is_running(self):
+        for sub_driver in self.sub_drivers:
+            if sub_driver.is_running():
+                return True
+        return False
+
+    def generate_frame(self, time: float, frame_width: int) -> np.ndarray:
+        wave = np.zeros(frame_width)
+        for sub_driver in self.sub_drivers:
+            wave += sub_driver.generate_frame(time, frame_width)
+        return wave.astype(np.float32)
