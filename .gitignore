@@ -1,6 +1,8 @@
-# Disabling pre-compiled Python
+# Disabling Python things
 *.pyc
 __pycache__/
+.mypy_cache/
+.pytest_cache/
 
 # Disabling vscode configurations
 .vscode/
