@@ -2,6 +2,10 @@ import keyboard
 from typing import List
 
 
+# TODO: Add in well-typed action results, instead of strings. I.e. enum class
+#       with different actions.
+
+
 class KeyboardInput:
     def __init__(self):
         self.button_states = {}

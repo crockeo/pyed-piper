@@ -121,6 +121,7 @@ class LingeringToneDriver(BaseDriver):
         self.driver = driver
         self.linger_time = linger_time
 
+        # TODO: Add in well-typed enum class
         self.state = "stopped"
         self.stop_time = 0
 

@@ -15,6 +15,7 @@ DURATION = 1
 LINGER_TIME = 1.0
 
 
+# TODO: Remove global variables
 drivers = {
     "1": LingeringToneDriver(
         SAMPLE_RATE, OverToneDriver(SAMPLE_RATE, notes["A3"], 1, 8), LINGER_TIME,
