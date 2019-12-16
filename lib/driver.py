@@ -38,7 +38,7 @@ class ToneDriver(BaseDriver):
         self.frequency = frequency
         self.amplitude = amplitude
 
-        self.start_time = 0
+        self.start_time = 0.0
         self.running = False
         self.zeroed = True
 
@@ -88,7 +88,7 @@ class ToneDriver(BaseDriver):
 
 class OverToneDriver(BaseDriver):
     def __init__(
-        self, sample_rate: float, frequency: float, amplitude: float, degree: float
+        self, sample_rate: float, frequency: float, amplitude: float, degree: int
     ):
         self.sub_drivers = [
             ToneDriver(sample_rate, frequency, amplitude / (d + 1))
@@ -128,7 +128,7 @@ class LingeringToneDriver(BaseDriver):
         self.linger_time = linger_time
 
         self.state = self.State.Stopped
-        self.stop_time = 0
+        self.stop_time = 0.0
 
     def start(self, time: float):
         self.driver.start(time)
