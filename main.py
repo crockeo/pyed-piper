@@ -12,7 +12,7 @@ from lib.notes import notes
 VOLUME = 0.05
 SAMPLE_RATE = 44100
 DURATION = 1
-LINGER_TIME = 0.25
+LINGER_TIME = 1.0
 
 
 drivers = {

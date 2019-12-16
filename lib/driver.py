@@ -1,5 +1,7 @@
 import numpy as np
 
+from lib import ramp
+
 
 class BaseDriver:
     def start(self, time: float):
@@ -106,10 +108,10 @@ class OverToneDriver(BaseDriver):
                 return True
         return False
 
-    def generate_frame(self, time: float, frame_width: int) -> np.ndarray:
-        wave = np.zeros(frame_width)
+    def generate_frame(self, time: float, frame_count: int) -> np.ndarray:
+        wave = np.zeros(frame_count)
         for sub_driver in self.sub_drivers:
-            wave += sub_driver.generate_frame(time, frame_width)
+            wave += sub_driver.generate_frame(time, frame_count)
         return wave.astype(np.float32)
 
 
@@ -119,35 +121,39 @@ class LingeringToneDriver(BaseDriver):
         self.driver = driver
         self.linger_time = linger_time
 
-        self.stopping = False
+        self.state = "stopped"
         self.stop_time = 0
 
     def start(self, time: float):
         self.driver.start(time)
-        self.stopping = False
+        self.state = "running"
 
     def stop(self, time: float):
-        self.stopping = True
+        self.state = "stopping"
         self.stop_time = time
 
     def is_running(self):
-        return self.driver.is_running() and not self.stopping
+        return not self.state == "stopped"
 
-    def generate_frame(self, time: float, frame_width: int) -> np.ndarray:
-        wave = self.driver.generate_frame(time, frame_width)
-        if self.stopping:
-            start_gradient = 1 - ((time - self.stop_time) / self.linger_time)
-            end_gradient = 1 - (
-                (time - self.stop_time + frame_width / self.sample_rate)
-                / self.linger_time
+    def generate_frame(self, time: float, frame_count: int) -> np.ndarray:
+        if not self.is_running():
+            return np.zeros(frame_count).astype(np.float32)
+
+        wave = self.driver.generate_frame(time, frame_count)
+        if self.state == "stopping":
+            wave *= ramp.exponential_ramp(
+                self.sample_rate,
+                self.stop_time,
+                self.stop_time + self.linger_time,
+                time,
+                frame_count,
             )
 
-            wave *= np.maximum(
-                np.linspace(start_gradient, end_gradient, frame_width), 0,
-            )
-
-            if start_gradient < 0:
+            if (
+                time + frame_count / self.sample_rate
+                >= self.stop_time + self.linger_time
+            ):
+                self.state = "stopped"
                 self.driver.stop(time)
-                self.stopping = False
 
         return wave.astype(np.float32)
