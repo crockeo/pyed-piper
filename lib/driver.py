@@ -1,3 +1,4 @@
+from enum import Enum
 import numpy as np
 
 from lib import ramp
@@ -116,32 +117,36 @@ class OverToneDriver(BaseDriver):
 
 
 class LingeringToneDriver(BaseDriver):
+    class State(Enum):
+        Stopped = "stopped"
+        Running = "running"
+        Stopping = "stopping"
+
     def __init__(self, sample_rate: float, driver: BaseDriver, linger_time: float):
         self.sample_rate = sample_rate
         self.driver = driver
         self.linger_time = linger_time
 
-        # TODO: Add in well-typed enum class
-        self.state = "stopped"
+        self.state = self.State.Stopped
         self.stop_time = 0
 
     def start(self, time: float):
         self.driver.start(time)
-        self.state = "running"
+        self.state = self.State.Running
 
     def stop(self, time: float):
-        self.state = "stopping"
+        self.state = self.State.Stopping
         self.stop_time = time
 
     def is_running(self):
-        return not self.state == "stopped"
+        return not self.state == self.State.Stopped
 
     def generate_frame(self, time: float, frame_count: int) -> np.ndarray:
         if not self.is_running():
             return np.zeros(frame_count).astype(np.float32)
 
         wave = self.driver.generate_frame(time, frame_count)
-        if self.state == "stopping":
+        if self.state == self.State.Stopping:
             wave *= ramp.exponential_ramp(
                 self.sample_rate,
                 self.stop_time,
@@ -154,7 +159,7 @@ class LingeringToneDriver(BaseDriver):
                 time + frame_count / self.sample_rate
                 >= self.stop_time + self.linger_time
             ):
-                self.state = "stopped"
+                self.state = self.State.Stopped
                 self.driver.stop(time)
 
         return wave.astype(np.float32)

@@ -6,6 +6,7 @@ from typing import List
 
 from lib.driver import LingeringToneDriver
 from lib.driver import OverToneDriver
+from lib.input import InputAction
 from lib.input import KeyboardInput
 from lib.notes import notes
 
@@ -57,9 +58,9 @@ def audio_callback(in_data, frame_count, time_info, status):
     wave = np.zeros(frame_count)
     for (key, driver) in drivers.items():
         action = keyboard_input.just_actioned(key)
-        if action == "pressed":
+        if action == InputAction.Pressed:
             driver.start(time)
-        elif action == "released":
+        elif action == InputAction.Released:
             driver.stop(time)
 
         wave += driver.generate_frame(time, frame_count)

@@ -1,9 +1,16 @@
+from enum import Enum
 import keyboard
 from typing import List
 
 
-# TODO: Add in well-typed action results, instead of strings. I.e. enum class
-#       with different actions.
+class InputAction(Enum):
+    """
+    Enumeration of the actions that can occur in an input provider.
+    """
+
+    NoAction = "none"
+    Pressed = "pressed"
+    Released = "released"
 
 
 class KeyboardInput:
@@ -18,7 +25,7 @@ class KeyboardInput:
         self.button_states[button] = pressed
         return pressed
 
-    def just_actioned(self, button: str) -> str:
+    def just_actioned(self, button: str) -> InputAction:
         """
         Returns the action that was just performed on the keyboard for the
         given key, if any. Returns one of three things:
@@ -31,8 +38,7 @@ class KeyboardInput:
         currently_pressed = self.is_pressed(button)
 
         if currently_pressed and not previously_pressed:
-            return "pressed"
-        elif not currently_pressed and previously_pressed:
-            return "released"
-        else:
-            return "none"
+            return InputAction.Pressed
+        if not currently_pressed and previously_pressed:
+            return InputAction.Released
+        return InputAction.NoAction
