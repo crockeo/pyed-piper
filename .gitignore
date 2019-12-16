@@ -1,4 +1,12 @@
+# Disabling pre-compiled Python
 *.pyc
+__pycache__/
+
+# Disabling vscode configurations
 .vscode/
+
+# Disabling macOS directory stuff
 .DS_Store
+
+# Disabling virtualenv
 venv/
