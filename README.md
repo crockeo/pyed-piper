@@ -16,6 +16,20 @@ $ python3 --version
 
 If Python 3 is not installed, you can find it [here](https://www.python.org/downloads/). After installation, try again from the command line to make sure that you can run Python 3. Rembmer if you used `python` or `python3`. It will be relevant for which `pip`, the Python package manager, you want to use.
 
+Next, you want to make sure that you have PortAudio installed. We use a library called PyAudio that depends PortAudio. For now, I will only cover installation for macOS. First, make sure you have brew installed.
+
+```bash
+$ brew --version
+```
+
+If you don't have it installed, refer to the [brew website](https://brew.sh/) for installation instructions. After it's installed, install PortAudio with Brew.
+
+```bash
+$ brew install portaudio
+```
+
+Now that PortAudio is installed, you can install the Python packages required to run the project.
+
 ```bash
 # If you used python
 $ pip install -r requirements.txt
