@@ -1,7 +1,19 @@
 from enum import Enum
 import numpy as np
+import os
+from typing import Union
+import wave
 
 from lib import ramp
+
+
+class DriverState(Enum):
+    Stopped = 0
+    Stopping = 1
+    Running = 2
+
+    def __le__(self, other: DriverState):
+        return self <= other
 
 
 class BaseDriver:
@@ -19,11 +31,9 @@ class BaseDriver:
             "BaseDriver.stop not implemented in {}".format(self.__class__.__name__)
         )
 
-    def is_running(self) -> bool:
+    def get_state(self) -> DriverState:
         raise NotImplementedError(
-            "BaseDriver.is_running not implemented in {}".format(
-                self.__class__.__name__
-            )
+            "BaseDriver.get_state not implemented in {}".format(self.__class__.__name__)
         )
 
     def generate_frame(self, time: float, frame_count: int) -> np.ndarray:
@@ -49,22 +59,20 @@ class ToneDriver(BaseDriver):
         self.amplitude = amplitude
 
         self.start_time = 0.0
-        self.running = False
-        self.zeroed = True
+        self.state = DriverState.Stopped
 
     def start(self, time: float):
         self.start_time = time
-        self.running = True
-        self.zeroed = False
+        self.state = DriverState.Running
 
     def stop(self, time: float):
-        self.running = False
+        self.state = DriverState.Stopping
 
-    def is_running(self):
-        return self.running or not self.zeroed
+    def get_state(self) -> DriverState:
+        return self.state
 
     def generate_frame(self, time: float, frame_count: int) -> np.ndarray:
-        if not self.is_running():
+        if self.state == DriverState.Stopped:
             return np.zeros(frame_count).astype(np.float32)
 
         frame_begin_time = time - self.start_time
@@ -77,7 +85,7 @@ class ToneDriver(BaseDriver):
 
         # TODO: Find out how to zero without having to loop through the entire
         #       wave. It's only ever 1024 frames wide, but still not great.
-        if not self.running and not self.zeroed:
+        if self.state == DriverState.Stopping:
             # If we're trying to stop, first we need to generate enough of the
             # tone to zero out the wave. Otherwise you hear a pop when you
             # release a button.
@@ -91,7 +99,7 @@ class ToneDriver(BaseDriver):
 
             if boundary > 0:
                 wave[boundary + 1 :] = np.zeros(len(wave) - boundary - 1)
-                self.zeroed = True
+                self.state = DriverState.Stopped
 
         return wave.astype(np.float32)
 
@@ -119,11 +127,8 @@ class OverToneDriver(BaseDriver):
         for sub_driver in self.sub_drivers:
             sub_driver.stop(time)
 
-    def is_running(self):
-        for sub_driver in self.sub_drivers:
-            if sub_driver.is_running():
-                return True
-        return False
+    def get_state(self) -> DriverState:
+        return max([sub_driver.get_state() for sub_driver in self.sub_drivers])
 
     def generate_frame(self, time: float, frame_count: int) -> np.ndarray:
         wave = np.zeros(frame_count)
@@ -139,36 +144,31 @@ class LingeringDriver(BaseDriver):
     after a string is released.
     """
 
-    class State(Enum):
-        Stopped = "stopped"
-        Running = "running"
-        Stopping = "stopping"
-
     def __init__(self, sample_rate: float, linger_time: float, driver: BaseDriver):
         self.sample_rate = sample_rate
         self.driver = driver
         self.linger_time = linger_time
 
-        self.state = self.State.Stopped
+        self.state = DriverState.Stopped
         self.stop_time = 0.0
 
     def start(self, time: float):
         self.driver.start(time)
-        self.state = self.State.Running
+        self.state = DriverState.Running
 
     def stop(self, time: float):
-        self.state = self.State.Stopping
+        self.state = DriverState.Stopping
         self.stop_time = time
 
     def is_running(self):
-        return not self.state == self.State.Stopped
+        return not self.state == DriverState.Stopped
 
     def generate_frame(self, time: float, frame_count: int) -> np.ndarray:
         if not self.is_running():
             return np.zeros(frame_count).astype(np.float32)
 
         wave = self.driver.generate_frame(time, frame_count)
-        if self.state == self.State.Stopping:
+        if self.state == DriverState.Stopping:
             wave *= ramp.exponential_ramp(
                 self.sample_rate,
                 self.stop_time,
@@ -181,7 +181,7 @@ class LingeringDriver(BaseDriver):
                 time + frame_count / self.sample_rate
                 >= self.stop_time + self.linger_time
             ):
-                self.state = self.State.Stopped
+                self.state = DriverState.Stopped
                 self.driver.stop(time)
 
         return wave.astype(np.float32)
