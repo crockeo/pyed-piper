@@ -5,6 +5,10 @@ from lib import ramp
 
 
 class BaseDriver:
+    """
+    Root class that defines the required interface for an audio driver.
+    """
+
     def start(self, time: float):
         raise NotImplementedError(
             "BaseDriver.start not implemented in {}".format(self.__class__.__name__)
@@ -31,6 +35,12 @@ class BaseDriver:
 
 
 class ToneDriver(BaseDriver):
+    """
+    An audio driver that plays a smooth tone at a given frequency. Does not
+    implement any kind of overtone. Implements smart stopping to prevent audio
+    pops.
+    """
+
     def __init__(
         self, sample_rate: float, frequency: float, amplitude: float,
     ):
@@ -87,6 +97,12 @@ class ToneDriver(BaseDriver):
 
 
 class OverToneDriver(BaseDriver):
+    """
+    An audio driver that plays a frequency with degrees of overtone. The
+    overtones are automatically scaled down in volume to maintain true-to-life
+    conservation of energy.
+    """
+
     def __init__(
         self, sample_rate: float, frequency: float, amplitude: float, degree: int
     ):
@@ -116,13 +132,19 @@ class OverToneDriver(BaseDriver):
         return wave.astype(np.float32)
 
 
-class LingeringToneDriver(BaseDriver):
+class LingeringDriver(BaseDriver):
+    """
+    An audio driver that lingers for a set period of time after being stopped.
+    Used to simulate how stringed instruments will continue to emit sound, even
+    after a string is released.
+    """
+
     class State(Enum):
         Stopped = "stopped"
         Running = "running"
         Stopping = "stopping"
 
-    def __init__(self, sample_rate: float, driver: BaseDriver, linger_time: float):
+    def __init__(self, sample_rate: float, linger_time: float, driver: BaseDriver):
         self.sample_rate = sample_rate
         self.driver = driver
         self.linger_time = linger_time

@@ -4,7 +4,7 @@ import numpy as np
 import time
 from typing import List
 
-from lib.driver import LingeringToneDriver
+from lib.driver import LingeringDriver
 from lib.driver import OverToneDriver
 from lib.input import InputAction
 from lib.input import KeyboardInput
@@ -26,45 +26,45 @@ class AudioManager:
         self.keyboard_input = KeyboardInput()
 
         self.drivers = {
-            "1": LingeringToneDriver(
+            "1": LingeringDriver(
                 SAMPLE_RATE,
+                LINGER_TIME,
                 OverToneDriver(SAMPLE_RATE, notes["A3"], 1, 8),
-                LINGER_TIME,
             ),
-            "2": LingeringToneDriver(
+            "2": LingeringDriver(
                 SAMPLE_RATE,
+                LINGER_TIME,
                 OverToneDriver(SAMPLE_RATE, notes["B3"], 1, 8),
-                LINGER_TIME,
             ),
-            "3": LingeringToneDriver(
+            "3": LingeringDriver(
                 SAMPLE_RATE,
+                LINGER_TIME,
                 OverToneDriver(SAMPLE_RATE, notes["C4"], 1, 8),
-                LINGER_TIME,
             ),
-            "4": LingeringToneDriver(
+            "4": LingeringDriver(
                 SAMPLE_RATE,
+                LINGER_TIME,
                 OverToneDriver(SAMPLE_RATE, notes["D4"], 1, 8),
-                LINGER_TIME,
             ),
-            "5": LingeringToneDriver(
+            "5": LingeringDriver(
                 SAMPLE_RATE,
+                LINGER_TIME,
                 OverToneDriver(SAMPLE_RATE, notes["E4"], 1, 8),
-                LINGER_TIME,
             ),
-            "6": LingeringToneDriver(
+            "6": LingeringDriver(
                 SAMPLE_RATE,
+                LINGER_TIME,
                 OverToneDriver(SAMPLE_RATE, notes["F4"], 1, 8),
-                LINGER_TIME,
             ),
-            "7": LingeringToneDriver(
+            "7": LingeringDriver(
                 SAMPLE_RATE,
+                LINGER_TIME,
                 OverToneDriver(SAMPLE_RATE, notes["G4"], 1, 8),
-                LINGER_TIME,
             ),
-            "8": LingeringToneDriver(
+            "8": LingeringDriver(
                 SAMPLE_RATE,
-                OverToneDriver(SAMPLE_RATE, notes["A4"], 1, 8),
                 LINGER_TIME,
+                OverToneDriver(SAMPLE_RATE, notes["A4"], 1, 8),
             ),
         }
 
