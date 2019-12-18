@@ -6,11 +6,12 @@ from typing import List
 
 from lib.driver import LingeringDriver
 from lib.driver import OverToneDriver
+from lib.driver import WaveDriver
 from lib.input import InputAction
 from lib.input import KeyboardInput
 from lib.notes import notes
 
-VOLUME = 0.05
+VOLUME = 0.5
 SAMPLE_RATE = 44100
 DURATION = 1
 LINGER_TIME = 1.0
@@ -27,14 +28,10 @@ class AudioManager:
 
         self.drivers = {
             "1": LingeringDriver(
-                SAMPLE_RATE,
-                LINGER_TIME,
-                OverToneDriver(SAMPLE_RATE, notes["A3"], 1, 8),
+                SAMPLE_RATE, LINGER_TIME, WaveDriver(SAMPLE_RATE, "res/sample.wav"),
             ),
             "2": LingeringDriver(
-                SAMPLE_RATE,
-                LINGER_TIME,
-                OverToneDriver(SAMPLE_RATE, notes["B3"], 1, 8),
+                SAMPLE_RATE, LINGER_TIME, WaveDriver(SAMPLE_RATE, "res/guitar.wav"),
             ),
             "3": LingeringDriver(
                 SAMPLE_RATE,
