@@ -1,8 +1,16 @@
 # pyed-piper
 
-## Installation
+Web-configurable music synthesis for the Bongo (Crockeo?) Box.
 
-### Computer Mode
+## Server
+
+This is the Python server part of the project. It handles music synthesis, and contains an HTTP API used to configure the synth. This HTTP API is used by the web UI, explained below.
+
+### Installation
+
+The server depends on native libraries, and so requires some setup beyond that of a normal Python library. This section assumes you're running macOS, but the process should be mostly the same across platforms.
+
+#### On A Computer
 
 First, ensure that you have Python 3 installed. To check if it is, run:
 
@@ -48,10 +56,30 @@ $ sudo python main.py
 $ sudo python3 main.py
 ```
 
-### Raspberry Pi Mode
+#### On the Raspberry Pi
 
 **TODO:** We have not begun setting up our Raspberry Pis, so this part is to come!
 
+### Music Synthesis
+
+TODO
+
+### HTTP API
+
+TODO
+
+## Web UI
+
+TODO
+
+### Installation
+
+TODO
+
+### Usage
+
+TODO
+
 ## License
 
-Refer to the `LICENSE` file in this repository.
+MIT Open Source License. Refer to the `LICENSE` file for information.
