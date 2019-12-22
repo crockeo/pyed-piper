@@ -8,7 +8,7 @@ import wave
 
 
 import pyaudio
-from lib import ramp
+from lib.synth import ramp
 
 
 class DriverState(Enum):

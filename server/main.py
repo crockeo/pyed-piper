@@ -4,12 +4,12 @@ import numpy as np
 import time
 from typing import List
 
-from lib.driver import LingeringDriver
-from lib.driver import OverToneDriver
-from lib.driver import WaveDriver
-from lib.input import InputAction
-from lib.input import KeyboardInput
-from lib.notes import notes
+from lib.synth.driver import LingeringDriver
+from lib.synth.driver import OverToneDriver
+from lib.synth.driver import WaveDriver
+from lib.synth.input import InputAction
+from lib.synth.input import KeyboardInput
+from lib.synth.notes import notes
 
 VOLUME = 0.5
 SAMPLE_RATE = 44100
@@ -28,10 +28,14 @@ class AudioManager:
 
         self.drivers = {
             "1": LingeringDriver(
-                SAMPLE_RATE, LINGER_TIME, WaveDriver(SAMPLE_RATE, "res/sample.wav"),
+                SAMPLE_RATE,
+                LINGER_TIME,
+                WaveDriver(SAMPLE_RATE, "server/res/sample.wav"),
             ),
             "2": LingeringDriver(
-                SAMPLE_RATE, LINGER_TIME, WaveDriver(SAMPLE_RATE, "res/guitar.wav"),
+                SAMPLE_RATE,
+                LINGER_TIME,
+                WaveDriver(SAMPLE_RATE, "server/res/guitar.wav"),
             ),
             "3": LingeringDriver(
                 SAMPLE_RATE,
