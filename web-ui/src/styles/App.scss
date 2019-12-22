@@ -21,6 +21,12 @@
   font-size: 2.1rem;
 }
 
+.button-grid {
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
