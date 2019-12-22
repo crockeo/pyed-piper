@@ -1,5 +1,24 @@
-.App {
-  text-align: center;
+@import "theme.scss";
+
+.header {
+  align-items: center;
+  background: $darkBackground;
+  box-shadow: 0px 6px 0px $secondaryColor;
+  color: $textColor;
+  display: flex;
+  margin-bottom: 6px;
+  padding: 1rem 2rem;
+}
+
+.logo {
+  height: 2.5rem;
+  margin-right: 1rem;
+  vertical-align: middle;
+  width: 2.5rem;
+}
+
+.title {
+  font-size: 2.1rem;
 }
 
 .App-logo {
