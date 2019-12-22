@@ -4,3 +4,6 @@ numpy==1.17.4
 PyAudio==0.2.11
 pytest==5.3.2
 pytest-mock==1.13.0
+peewee==3.13.1
+flask==1.0.2
+gevent==1.4.0
