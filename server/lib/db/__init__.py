@@ -1,5 +1,8 @@
 from peewee import Model
 from peewee import SqliteDatabase
+from playhouse.shortcuts import dict_to_model
+from playhouse.shortcuts import model_to_dict
+import json
 
 
 class Database:
@@ -24,3 +27,9 @@ class Database:
 class BaseModel(Model):
     class Meta:
         database = Database.get()
+
+    def to_json(self) -> str:
+        """
+        Serializes the child of this BaseModel to JSON.
+        """
+        return json.dumps(model_to_dict(self))
