@@ -12,3 +12,8 @@ __pycache__/
 
 # Disabling virtualenv
 venv/
+
+# Disabling server's database
+pyed-piper.db
+pyed-piper.db-shm
+pyed-piper.db-wal

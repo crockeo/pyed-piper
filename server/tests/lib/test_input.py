@@ -1,7 +1,7 @@
 import pytest
 from typing import List
 
-from lib import input
+from lib.synth import input
 
 
 @pytest.fixture
@@ -67,7 +67,7 @@ def test_keyboard_input_just_actioned_pressed(generate_mock_keyboard):
 
     keyboard_input = input.KeyboardInput()
     keyboard_input.is_pressed("")
-    assert "pressed" == keyboard_input.just_actioned("")
+    assert input.InputAction.Pressed == keyboard_input.just_actioned("")
 
 
 def test_keyboard_input_just_actioned_released(generate_mock_keyboard):
@@ -79,7 +79,7 @@ def test_keyboard_input_just_actioned_released(generate_mock_keyboard):
 
     keyboard_input = input.KeyboardInput()
     keyboard_input.is_pressed("")
-    assert "released" == keyboard_input.just_actioned("")
+    assert input.InputAction.Released == keyboard_input.just_actioned("")
 
 
 def test_keyboard_input_just_actioned_none(generate_mock_keyboard):
@@ -92,7 +92,7 @@ def test_keyboard_input_just_actioned_none(generate_mock_keyboard):
     keyboard_input = input.KeyboardInput()
 
     keyboard_input.is_pressed("")
-    assert "none" == keyboard_input.just_actioned("")
+    assert input.InputAction.NoAction == keyboard_input.just_actioned("")
 
     keyboard_input.is_pressed("")
-    assert "none" == keyboard_input.just_actioned("")
+    assert input.InputAction.NoAction == keyboard_input.just_actioned("")
