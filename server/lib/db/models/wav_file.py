@@ -7,3 +7,4 @@ from lib.db import BaseModel
 class WavFile(BaseModel):
     id = IntegerField(primary_key=True)
     path = CharField()
+    name = CharField()

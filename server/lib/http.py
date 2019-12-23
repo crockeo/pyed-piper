@@ -15,6 +15,10 @@ def generate_flask_app() -> Flask:
 
     app = Flask(__name__)
 
+    @app.route("/button/count", methods=["GET"])
+    def get_button_count():
+        return 15
+
     @app.route("/button/<int:index>", methods=["GET"])
     def get_synth_button_setting(index):
         """
@@ -23,6 +27,9 @@ def generate_flask_app() -> Flask:
         object when one does not already exist. This allows the web UI to
         be dumb, and always assume there are buttons 0-15, inclusive.
         """
+        if index < 0 or index > get_button_count():
+            # TODO: Respond with 404, since we only support 15 buttons
+            pass
         query = SynthButtonSetting.select().where(SynthButtonSetting.index == index)
 
         if len(query) > 0:
