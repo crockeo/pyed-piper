@@ -22,9 +22,9 @@ def get_synth_button_setting(index: int) -> Optional[SynthButtonSetting]:
     if index < 0 or index >= get_synth_button_count():
         return None
 
-    # TODO: Something about SynthButtonSetting.get()?
-    query = SynthButtonSetting.select().where(SynthButtonSetting.index == index)
-    if len(query) == 0:
+    try:
+        setting = SynthButtonSetting.get_by_id(index)
+    except SynthButtonSetting.DoesNotExist:
         index_map = [
             "A3",
             "B3",
@@ -45,13 +45,11 @@ def get_synth_button_setting(index: int) -> Optional[SynthButtonSetting]:
 
         setting = SynthButtonSetting.create(
             index=index,
-            mode=SynthButtonMode.Tone,
+            mode=SynthButtonMode.Tone.value,
             linger_time=0.25,
             frequency=notes[index_map[index]],
             overtones=4,
         )
-    else:
-        setting = query[0]
 
     return setting
 
