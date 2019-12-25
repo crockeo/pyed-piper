@@ -4,6 +4,8 @@ import numpy as np
 import time
 from typing import List
 
+from lib.synth.driver import BaseDriver
+from lib.synth.driver import DriverState
 from lib.synth.driver.lingering_driver import LingeringDriver
 from lib.synth.driver.over_tone_driver import OverToneDriver
 from lib.synth.driver.wave_driver import WaveDriver
@@ -11,75 +13,32 @@ from lib.synth.input import InputAction
 from lib.synth.input.keyboard import KeyboardInput
 from lib.synth.notes import notes
 
-VOLUME = 0.5
-SAMPLE_RATE = 44100
-DURATION = 1
-LINGER_TIME = 1.0
-
 
 class AudioManager:
-    def __init__(self):
-        self.volume = 0.05
-        self.sample_rate = 44100
-        self.linger_time = 1.0
+    VOLUME = 0.05
+    SAMPLE_RATE = 44100
+
+    def __init__(self, drivers: List[BaseDriver] = []):
+        self.drivers = drivers
 
         self.frame_start = 0
         self.keyboard_input = KeyboardInput()
-
-        self.drivers = {
-            1: LingeringDriver(
-                SAMPLE_RATE,
-                LINGER_TIME,
-                WaveDriver(SAMPLE_RATE, "server/res/sample.wav"),
-            ),
-            1: LingeringDriver(
-                SAMPLE_RATE,
-                LINGER_TIME,
-                WaveDriver(SAMPLE_RATE, "server/res/guitar.wav"),
-            ),
-            3: LingeringDriver(
-                SAMPLE_RATE,
-                LINGER_TIME,
-                OverToneDriver(SAMPLE_RATE, notes["C4"], 1, 8),
-            ),
-            4: LingeringDriver(
-                SAMPLE_RATE,
-                LINGER_TIME,
-                OverToneDriver(SAMPLE_RATE, notes["D4"], 1, 8),
-            ),
-            5: LingeringDriver(
-                SAMPLE_RATE,
-                LINGER_TIME,
-                OverToneDriver(SAMPLE_RATE, notes["E4"], 1, 8),
-            ),
-            6: LingeringDriver(
-                SAMPLE_RATE,
-                LINGER_TIME,
-                OverToneDriver(SAMPLE_RATE, notes["F4"], 1, 8),
-            ),
-            7: LingeringDriver(
-                SAMPLE_RATE,
-                LINGER_TIME,
-                OverToneDriver(SAMPLE_RATE, notes["G4"], 1, 8),
-            ),
-            8: LingeringDriver(
-                SAMPLE_RATE,
-                LINGER_TIME,
-                OverToneDriver(SAMPLE_RATE, notes["A4"], 1, 8),
-            ),
-        }
 
     def __enter__(self):
         """
         Shim for start method so that it can be used in with statements.
         """
         self.start()
+        return self
 
     def __exit__(self, type, value, traceback):
         """
         Shim for stop method so that it can be used in with statements.
         """
         self.stop()
+
+    def _load_drivers(self):
+        pass
 
     def start(self):
         """
@@ -89,7 +48,7 @@ class AudioManager:
         self.stream = self.audio_instance.open(
             format=pyaudio.paFloat32,
             channels=1,
-            rate=SAMPLE_RATE,
+            rate=self.SAMPLE_RATE,
             output=True,
             stream_callback=self.audio_callback,
         )
@@ -108,10 +67,10 @@ class AudioManager:
         Generates audio data for the audio stream. Called at each instant the
         audio stream requires more frames.
         """
-        time = self.frame_start / self.sample_rate
+        time = self.frame_start / self.SAMPLE_RATE
 
         wave = np.zeros(frame_count)
-        for (key, driver) in self.drivers.items():
+        for (key, driver) in enumerate(self.drivers):
             action = self.keyboard_input.just_actioned(key)
             if action == InputAction.Pressed:
                 driver.start(time)
@@ -123,6 +82,23 @@ class AudioManager:
         self.frame_start += frame_count
 
         return (
-            (wave * VOLUME).astype(np.float32),
+            (wave * self.VOLUME).astype(np.float32),
             pyaudio.paContinue,
         )
+
+    def set_driver(self, button: int, driver: BaseDriver):
+        """
+        Assigns the driver at a given button index to a given driver. Used to
+        update the AudioManager while running.
+        """
+        if button < 0 or button > self.keyboard_input.get_button_count():
+            raise IndexError(
+                "Button must be within [0,{}], was {}".format(
+                    self.keyboard_input.get_button_count(), button
+                )
+            )
+
+        old_driver = self.drivers[button]
+        if old_driver.get_state() == DriverState.Running:
+            old_driver.stop(self.frame_start / self.SAMPLE_RATE)
+        self.drivers[button] = driver

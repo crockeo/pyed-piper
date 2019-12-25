@@ -2,9 +2,15 @@ from playhouse.shortcuts import update_model_from_dict
 from typing import Dict
 from typing import Optional
 
+from lib.common.adapters import synth_button_setting_to_base_driver
 from lib.db.models.synth_button_setting import SynthButtonMode
 from lib.db.models.synth_button_setting import SynthButtonSetting
 from lib.db.models.wav_file import WavFile
+from lib.synth import AudioManager
+from lib.synth.driver import BaseDriver
+from lib.synth.driver.lingering_driver import LingeringDriver
+from lib.synth.driver.over_tone_driver import OverToneDriver
+from lib.synth.driver.wave_driver import WaveDriver
 from lib.synth.notes import notes
 
 
@@ -43,6 +49,7 @@ def get_synth_button_setting(index: int) -> Optional[SynthButtonSetting]:
             "F5",
             "G5",
             "A5",
+            "B5",
         ]
 
         setting = SynthButtonSetting.create(
@@ -57,7 +64,7 @@ def get_synth_button_setting(index: int) -> Optional[SynthButtonSetting]:
 
 
 def put_synth_button_setting(
-    index: int, new_fields: Dict
+    index: int, new_fields: Dict, audio_manager: AudioManager,
 ) -> Optional[SynthButtonSetting]:
     """
     Updates a SynthButtonSetting. Checks that certain invariants hold on the
@@ -90,5 +97,9 @@ def put_synth_button_setting(
 
     update_model_from_dict(setting, new_fields)
     setting.save()
+
+    audio_manager.set_driver(
+        index, synth_button_setting_to_base_driver(audio_manager.sample_rate, setting),
+    )
 
     return setting
