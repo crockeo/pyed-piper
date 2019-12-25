@@ -39,7 +39,10 @@ def generate_flask_app() -> Flask:
         json = request.get_json()
         if json is None:
             return "", status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
+
         setting = synth_button_setting_controller.put_synth_button_setting(index, json)
+        if setting is None:
+            return "", status.HTTP_400_BAD_REQUEST
 
         response = Response(setting.to_json(), content_type="application/json")
         return response

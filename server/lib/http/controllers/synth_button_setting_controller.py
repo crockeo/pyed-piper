@@ -1,8 +1,10 @@
+from playhouse.shortcuts import update_model_from_dict
 from typing import Dict
 from typing import Optional
 
 from lib.db.models.synth_button_setting import SynthButtonMode
 from lib.db.models.synth_button_setting import SynthButtonSetting
+from lib.db.models.wav_file import WavFile
 from lib.synth.notes import notes
 
 
@@ -58,16 +60,35 @@ def put_synth_button_setting(
     index: int, new_fields: Dict
 ) -> Optional[SynthButtonSetting]:
     """
-    Updates a SynthButtonSetting.
+    Updates a SynthButtonSetting. Checks that certain invariants hold on the
+    updates being requested. Namely:
+
+    - On mode change, ensure the following:
+      - If mode -> tone: frequency and overtones must exist
+      - If mode -> wav:  wav_id must exist, and there must exist a real wav at
+        that ID
     """
-    if get_synth_button_setting(index) is None:
+    # TODO: Clean this whole thing up
+    if (
+        new_fields.get("mode") == SynthButtonMode.Tone.value
+        and ("frequency" not in new_fields or "overtones" not in new_fields)
+    ) or (
+        new_fields.get("mode") == SynthButtonMode.Wav.value
+        and ("wav_id" not in new_fields)
+    ):
         return None
 
-    # TODO: Check internal consistency before allowing update:
-    #   - Tone mode = all tone fields defined, no wav fields defined
-    #   - Wav mode = all wav fields defined, no tone fields defined
-    SynthButtonSetting.update(**new_fields).where(
-        SynthButtonSetting.index == index
-    ).execute()
+    if (
+        "wav_id" in new_fields
+        and len(WavFile.select().where(WavFile.id == new_fields["wav_id"])) == 0
+    ):
+        return None
 
-    return get_synth_button_setting(index)
+    setting = get_synth_button_setting(index)
+    if setting is None:
+        return None
+
+    update_model_from_dict(setting, new_fields)
+    setting.save()
+
+    return setting
