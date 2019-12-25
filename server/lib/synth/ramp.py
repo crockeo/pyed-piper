@@ -2,7 +2,7 @@ import numpy as np
 from typing import Tuple
 
 
-def __get_ramp_positions(
+def _get_ramp_positions(
     sample_rate: float,
     start_time: float,
     end_time: float,
@@ -35,7 +35,7 @@ def linear_ramp(
     If generated during a frame that would exceed the end_time, it clamps the
     ramp to 0.0.
     """
-    start, end = __get_ramp_positions(
+    start, end = _get_ramp_positions(
         sample_rate, start_time, end_time, current_time, frame_count
     )
 
@@ -52,7 +52,7 @@ def exponential_ramp(
     """
     Generates an exponential ramp between the start time and the end time.
     """
-    start, end = __get_ramp_positions(
+    start, end = _get_ramp_positions(
         sample_rate, start_time, end_time, current_time, frame_count,
     )
 
