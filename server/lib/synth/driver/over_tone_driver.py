@@ -1,8 +1,8 @@
 import numpy as np
 
-from lib.synth.drivers import BaseDriver
-from lib.synth.drivers import DriverState
-from lib.synth.drivers.tone_driver import ToneDriver
+from lib.synth.driver import BaseDriver
+from lib.synth.driver import DriverState
+from lib.synth.driver.tone_driver import ToneDriver
 
 
 class OverToneDriver(BaseDriver):
