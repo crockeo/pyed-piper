@@ -3,11 +3,17 @@ import keyboard
 import signal
 
 from lib.common.initialization import load_drivers
+from lib.db.models.synth_button_setting import SynthButtonSetting
+from lib.db.models.wav_file import WavFile
+from lib.db import Database
 from lib.http import generate_flask_app
 from lib.synth import AudioManager
 
 
 def main():
+    db = Database.get()
+    db.create_tables([SynthButtonSetting, WavFile])
+
     drivers = load_drivers(AudioManager.SAMPLE_RATE)
     with AudioManager(drivers) as audio_manager:
         app = generate_flask_app(audio_manager)

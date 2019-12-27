@@ -16,9 +16,6 @@ def generate_flask_app(audio_manager: AudioManager) -> Flask:
     Generates a Flask application on demand. In a function, rather than a
     global objcet, to avoid the use of global variables.
     """
-    db = Database.get()
-    db.create_tables([SynthButtonSetting, WavFile])
-
     app = Flask(__name__)
     CORS(app)
 
