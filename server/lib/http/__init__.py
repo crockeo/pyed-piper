@@ -47,18 +47,19 @@ def generate_flask_app(audio_manager: AudioManager) -> Flask:
         response = Response(setting.to_json(), content_type="application/json")
         return response
 
+    @app.route("/samples", methods=["GET"])
+    def get_all_samples():
+        # TODO: Retrieve and send all .wav files
+        pass
+
     @app.route("/sample/<uuid:id>", methods=["GET"])
     def get_sample(id):
-        query = WavFile.select().where(WavFile.id == id)
-        if len(query) == 0:
-            return "", status.HTTP_404_NOT_FOUND
-
-        # TODO: Send .wav file with correct mimetype
+        # TODO: Retrieve and send .wav file
         pass
 
     @app.route("/sample", methods=["POST"])
     def add_sample():
-        # TODO
+        # TODO: Parse multipart and save
         pass
 
     return app
