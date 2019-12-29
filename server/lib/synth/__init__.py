@@ -4,6 +4,7 @@ import numpy as np
 import time
 from typing import List
 
+from lib.common import config
 from lib.synth.driver import BaseDriver
 from lib.synth.driver import DriverState
 from lib.synth.driver.lingering_driver import LingeringDriver
@@ -15,9 +16,6 @@ from lib.synth.notes import notes
 
 
 class AudioManager:
-    VOLUME = 0.05
-    SAMPLE_RATE = 44100
-
     def __init__(self, drivers: List[BaseDriver] = []):
         self.drivers = drivers
 
@@ -48,7 +46,7 @@ class AudioManager:
         self.stream = self.audio_instance.open(
             format=pyaudio.paFloat32,
             channels=1,
-            rate=self.SAMPLE_RATE,
+            rate=config.SAMPLE_RATE,
             output=True,
             stream_callback=self.audio_callback,
         )
@@ -67,7 +65,7 @@ class AudioManager:
         Generates audio data for the audio stream. Called at each instant the
         audio stream requires more frames.
         """
-        time = self.frame_start / self.SAMPLE_RATE
+        time = self.frame_start / config.SAMPLE_RATE
 
         wave = np.zeros(frame_count)
         for (key, driver) in enumerate(self.drivers):
@@ -82,7 +80,7 @@ class AudioManager:
         self.frame_start += frame_count
 
         return (
-            (wave * self.VOLUME).astype(np.float32),
+            (wave * config.VOLUME).astype(np.float32),
             pyaudio.paContinue,
         )
 
@@ -100,5 +98,5 @@ class AudioManager:
 
         old_driver = self.drivers[button]
         if old_driver.get_state() == DriverState.Running:
-            old_driver.stop(self.frame_start / self.SAMPLE_RATE)
+            old_driver.stop(self.frame_start / config.SAMPLE_RATE)
         self.drivers[button] = driver

@@ -2,6 +2,7 @@ from gevent.pywsgi import WSGIServer
 import keyboard
 import signal
 
+from lib.common import config
 from lib.common.initialization import load_drivers
 from lib.db.models.synth_button_setting import SynthButtonSetting
 from lib.db.models.wav_file import WavFile
@@ -14,7 +15,7 @@ def main():
     db = Database.get()
     db.create_tables([SynthButtonSetting, WavFile])
 
-    drivers = load_drivers(AudioManager.SAMPLE_RATE)
+    drivers = load_drivers(config.SAMPLE_RATE)
     with AudioManager(drivers) as audio_manager:
         app = generate_flask_app(audio_manager)
         http_server = WSGIServer(("", 3001), app)

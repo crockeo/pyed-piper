@@ -4,10 +4,10 @@ from playhouse.shortcuts import dict_to_model
 from playhouse.shortcuts import model_to_dict
 import json
 
+from lib.common import config
+
 
 class Database:
-    DATABASE_PATH = "pyed-piper.db"
-
     database_instance = None
 
     @classmethod
@@ -19,7 +19,7 @@ class Database:
         """
         if cls.database_instance is None:
             cls.database_instance = SqliteDatabase(
-                cls.DATABASE_PATH, pragmas={"journal_mode": "wal"},
+                config.DATABASE_PATH, pragmas={"journal_mode": "wal"},
             )
         return cls.database_instance
 
