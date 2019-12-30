@@ -1,4 +1,5 @@
 from os import path
+from typing import List
 from typing import Optional
 from typing import Tuple
 import uuid
@@ -8,7 +9,32 @@ from lib.common import config
 from lib.db.models.wav_file import WavFile
 
 
-def post_wav_file(name: str, data: bytes) -> WavFile:
+def get_samples() -> List[WavFile]:
+    """
+    Retrieves all of the WavFiles from the database.
+    """
+    # TODO: Split out into pagination, so that the query executes quickly even
+    #       when we have many samples.
+    return list(WavFile.select().execute())
+
+
+def get_sample(id: str) -> Optional[Tuple[WavFile, bytes]]:
+    """
+    Retrieves a WavFile from the database. Uses the data contained therein to
+    load a .wav file from the filesystem and return it as a string of bytes.
+    """
+    try:
+        wav_file = WavFile.get_by_id(id)
+    except WavFile.DoesNotExist:
+        return None
+
+    with open(wav_file.path, "rb") as f:
+        data = f.read()
+
+    return (wav_file, data)
+
+
+def post_sample(name: str, data: bytes) -> WavFile:
     """
     Inserts a new WavFile into the database. Returns the corresponding WavFile
     that is constructed.
@@ -23,22 +49,6 @@ def post_wav_file(name: str, data: bytes) -> WavFile:
     wav_file.save()
 
     return wav_file
-
-
-def get_wav_file(id: str) -> Optional[Tuple[WavFile, bytes]]:
-    """
-    Retrieves a WavFile from the database. Uses the data contained therein to
-    load a .wav file from the filesystem and return it as a string of bytes.
-    """
-    try:
-        wav_file = WavFile.get_by_id(str)
-    except WavFile.DoesNotExist:
-        return None
-
-    with open(wav_file.path, "rb") as f:
-        data = f.read()
-
-    return (wav_file, data)
 
 
 def _generate_path(id: str) -> str:

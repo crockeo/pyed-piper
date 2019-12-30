@@ -3,11 +3,13 @@ from flask import Response
 from flask import request
 from flask_api import status
 from flask_cors import CORS
+import json
 
 from lib.db import Database
 from lib.db.models.synth_button_setting import SynthButtonSetting
 from lib.db.models.wav_file import WavFile
 from lib.http.controllers import synth_button_setting_controller
+from lib.http.controllers import wav_file_controller
 from lib.synth import AudioManager
 
 
@@ -29,8 +31,7 @@ def generate_flask_app(audio_manager: AudioManager) -> Flask:
         if setting is None:
             return "", status.HTTP_404_NOT_FOUND
 
-        response = Response(setting.to_json(), content_type="application/json")
-        return response
+        return Response(setting.to_json(), content_type="application/json")
 
     @app.route("/button/<int:index>", methods=["PUT"])
     def put_synth_button_setting(index: int):
@@ -44,22 +45,35 @@ def generate_flask_app(audio_manager: AudioManager) -> Flask:
         if setting is None:
             return "", status.HTTP_400_BAD_REQUEST
 
-        response = Response(setting.to_json(), content_type="application/json")
-        return response
+        return Response(setting.to_json(), content_type="application/json")
 
     @app.route("/samples", methods=["GET"])
-    def get_all_samples():
-        # TODO: Retrieve and send all .wav files
-        pass
+    def get_samples():
+        wav_files = wav_file_controller.get_samples()
+        return Response(
+            json.dumps([wav_file.to_json() for wav_file in wav_files]),
+            content_type="application/json",
+        )
 
     @app.route("/sample/<uuid:id>", methods=["GET"])
-    def get_sample(id):
-        # TODO: Retrieve and send .wav file
-        pass
+    def get_sample(id: str):
+        wav_file = wav_file_controller.get_sample(id)
+        if wav_file is None:
+            return "", status.HTTP_404_NOT_FOUND
+        _, data = wav_file
+
+        return Response(data, content_type="audio/wav")
 
     @app.route("/sample", methods=["POST"])
-    def add_sample():
-        # TODO: Parse multipart and save
-        pass
+    def post_sample():
+        if "file" not in request.files or request.files["file"].filename:
+            return "", status.HTTP_400_BAD_REQUEST
+        file = request.files["file"]
+
+        wav_file = wav_file_controller.post_sample(file.filename, file.read())
+
+        return Response(
+            json.dumps({"id": wav_file.id}), content_type="application/json"
+        )
 
     return app
