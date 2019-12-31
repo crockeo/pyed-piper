@@ -2,6 +2,7 @@ from playhouse.shortcuts import update_model_from_dict
 from typing import Dict
 from typing import Optional
 
+from lib.common import config
 from lib.common.adapters import synth_button_setting_to_base_driver
 from lib.db.models.synth_button_setting import SynthButtonMode
 from lib.db.models.synth_button_setting import SynthButtonSetting
@@ -99,7 +100,7 @@ def put_synth_button_setting(
     setting.save()
 
     audio_manager.set_driver(
-        index, synth_button_setting_to_base_driver(audio_manager.sample_rate, setting),
+        index, synth_button_setting_to_base_driver(config.SAMPLE_RATE, setting),
     )
 
     return setting

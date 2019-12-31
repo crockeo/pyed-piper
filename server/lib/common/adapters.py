@@ -1,8 +1,10 @@
 from lib.db.models.synth_button_setting import SynthButtonMode
 from lib.db.models.synth_button_setting import SynthButtonSetting
+from lib.db.models.wav_file import WavFile
 from lib.synth.driver import BaseDriver
 from lib.synth.driver.over_tone_driver import OverToneDriver
 from lib.synth.driver.lingering_driver import LingeringDriver
+from lib.synth.driver.wave_driver import WaveDriver
 
 
 def synth_button_setting_to_base_driver(
@@ -19,6 +21,8 @@ def synth_button_setting_to_base_driver(
     """
     if synth_button_setting.mode == SynthButtonMode.Tone.value:
         base_driver = _construct_over_tone_driver(sample_rate, synth_button_setting)
+    elif synth_button_setting.mode == SynthButtonMode.Wav.value:
+        base_driver = _construct_wave_driver(sample_rate, synth_button_setting)
     else:
         raise NotImplementedError(
             "synth_button_setting_to_base_driver not implemented for mode '{}'".format(
@@ -30,10 +34,12 @@ def synth_button_setting_to_base_driver(
 
 
 def _construct_over_tone_driver(
-    sample_rate: float, synth_button_setting: SynthButtonSetting
+    sample_rate: float, synth_button_setting: SynthButtonSetting,
 ) -> OverToneDriver:
     if synth_button_setting.mode != SynthButtonMode.Tone.value:
-        raise ValueError()
+        raise ValueError(
+            "_construct_over_tone_driver only defined on SynthButtonMode.Tone"
+        )
 
     return OverToneDriver(
         sample_rate,
@@ -41,3 +47,12 @@ def _construct_over_tone_driver(
         1.0,  # TODO: Allow people to configure loudness driver-by-driver?
         synth_button_setting.overtones,
     )
+
+
+def _construct_wave_driver(
+    sample_rate: float, synth_button_setting: SynthButtonSetting,
+) -> WaveDriver:
+    if synth_button_setting.mode != SynthButtonMode.Wav.value:
+        raise ValueError("_construct_wave_driver only defined on SynthButtonMode.Wav")
+
+    return WaveDriver(sample_rate, synth_button_setting.wav_id.path)
