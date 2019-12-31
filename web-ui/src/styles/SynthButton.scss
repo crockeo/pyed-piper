@@ -1,25 +1,9 @@
 @import "theme.scss";
 
 .SynthButton {
-  background-color: $secondaryColor;
-  border-radius: 4px;
-  box-shadow: 0px 2px 0px $darkBackground;
-  cursor: pointer;
   height: fit-content;
-  margin-bottom: 2px;
   padding: 1rem;
-  transition: background-color 0.15s;
   width: fit-content;
-}
-
-.SynthButton:hover {
-  background-color: darken($secondaryColor, 5%);
-  transition: background-color 0.15s;
-}
-
-.SynthButton:active {
-  box-shadow: none;
-  transform: translate(0, 2px);
 }
 
 .play {

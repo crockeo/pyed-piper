@@ -12,9 +12,9 @@ interface ISynthButtonProps {
 
 const SynthButton: React.FC<ISynthButtonProps> = (props: ISynthButtonProps) => {
   return (
-    <div className="SynthButton" onClick={props.onClick}>
+    <button className="SynthButton" onClick={props.onClick}>
       <img src={props.running ? pause : play} className="play" alt="play" />
-    </div>
+    </button>
   );
 };
 
