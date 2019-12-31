@@ -2,20 +2,20 @@ import React from "react";
 
 import pause from "../res/pause.svg";
 import play from "../res/play.svg";
-import "../styles/SynthButton.scss";
+import "../styles/PlayButton.scss";
 
-interface ISynthButtonProps {
+interface IPlayButtonProps {
   children?: React.ReactNode;
   onClick?: (event: React.MouseEvent<HTMLElement, MouseEvent>) => void | undefined;
   running: boolean;
 }
 
-const SynthButton: React.FC<ISynthButtonProps> = (props: ISynthButtonProps) => {
+const PlayButton: React.FC<IPlayButtonProps> = (props: IPlayButtonProps) => {
   return (
-    <button className="SynthButton" onClick={props.onClick}>
+    <button className="PlayButton" onClick={props.onClick}>
       <img src={props.running ? pause : play} className="play" alt="play" />
     </button>
   );
 };
 
-export default SynthButton;
+export default PlayButton;

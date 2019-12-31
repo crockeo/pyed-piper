@@ -4,7 +4,7 @@ import logo from "../res/logo.svg";
 import "../styles/App.scss";
 
 import AddSample from "./AddSample";
-import SynthButton from "./SynthButton";
+import PlayButton from "./PlayButton";
 
 const App: React.FC = () => {
   return (
@@ -19,7 +19,9 @@ const App: React.FC = () => {
       <div className="body">
         <div className="button-grid">
           {new Array(16).fill(0).map((_, i) => (
-            <SynthButton running={i % 2 === 0} key={i} />
+            <div className="button-grid-entry">
+              <PlayButton running={i % 2 === 0} key={i} />
+            </div>
           ))}
         </div>
       </div>
