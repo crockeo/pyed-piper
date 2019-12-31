@@ -5,6 +5,6 @@ from lib.db import BaseModel
 
 
 class WavFile(BaseModel):
-    id = UUIDField(primary_key=True)
+    id = CharField(primary_key=True)
     path = CharField()
     name = CharField()

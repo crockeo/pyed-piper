@@ -17,3 +17,6 @@ venv/
 pyed-piper.db
 pyed-piper.db-shm
 pyed-piper.db-wal
+
+# Root level resources for the server
+res/

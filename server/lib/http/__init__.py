@@ -55,7 +55,7 @@ def generate_flask_app(audio_manager: AudioManager) -> Flask:
             content_type="application/json",
         )
 
-    @app.route("/sample/<uuid:id>", methods=["GET"])
+    @app.route("/sample/<id>", methods=["GET"])
     def get_sample(id: str):
         wav_file = wav_file_controller.get_sample(id)
         if wav_file is None:
@@ -66,9 +66,10 @@ def generate_flask_app(audio_manager: AudioManager) -> Flask:
 
     @app.route("/sample", methods=["POST"])
     def post_sample():
-        if "file" not in request.files or request.files["file"].filename:
+        file_name = "sampleFile"
+        if file_name not in request.files or request.files[file_name].filename == "":
             return "", status.HTTP_400_BAD_REQUEST
-        file = request.files["file"]
+        file = request.files[file_name]
 
         wav_file = wav_file_controller.post_sample(file.filename, file.read())
 

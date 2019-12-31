@@ -1,3 +1,4 @@
+import os
 from os import path
 from typing import List
 from typing import Optional
@@ -45,8 +46,7 @@ def post_sample(name: str, data: bytes) -> WavFile:
     with open(path, "wb") as f:
         f.write(data)
 
-    wav_file = WavFile(id=id, path=path, name=name)
-    wav_file.save()
+    wav_file = WavFile.create(id=id, path=path, name=name)
 
     return wav_file
 
@@ -58,4 +58,4 @@ def _generate_path(id: str) -> str:
 
     Each individual file will be titled by its id in the database.
     """
-    return path.join(config.RES_FILE_ROOT, config.WAV_FILE_ROOT, id, ".wav")
+    return path.join(config.RES_FILE_ROOT, config.WAV_FILE_ROOT, id + ".wav")
