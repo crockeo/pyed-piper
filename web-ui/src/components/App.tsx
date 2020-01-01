@@ -19,8 +19,8 @@ const App: React.FC = () => {
       <div className="body">
         <div className="button-grid">
           {new Array(16).fill(0).map((_, i) => (
-            <div className="button-grid-entry">
-              <PlayButton running={i % 2 === 0} key={i} />
+            <div className="button-grid-entry" key={i}>
+              <PlayButton running={i % 2 === 0} />
             </div>
           ))}
         </div>
