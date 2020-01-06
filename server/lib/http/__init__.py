@@ -51,7 +51,7 @@ def generate_flask_app(audio_manager: AudioManager) -> Flask:
     def get_samples():
         wav_files = wav_file_controller.get_samples()
         return Response(
-            json.dumps([wav_file.to_json() for wav_file in wav_files]),
+            "[" + ",".join([wav_file.to_json() for wav_file in wav_files]) + "]",
             content_type="application/json",
         )
 
