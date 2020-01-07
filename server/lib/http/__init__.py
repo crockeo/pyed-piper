@@ -25,8 +25,25 @@ def generate_flask_app(audio_manager: AudioManager) -> Flask:
     def get_button_count():
         return synth_button_setting_controller.get_synth_button_count()
 
+    @app.route("/buttons", methods=["GET"])
+    def get_synth_button_settings():
+        synth_button_settings = (
+            synth_button_setting_controller.get_synth_button_settings()
+        )
+        return Response(
+            "["
+            + ",".join(
+                [
+                    synth_button_setting.to_json()
+                    for synth_button_setting in synth_button_settings
+                ]
+            )
+            + "]",
+            content_type="application/json",
+        )
+
     @app.route("/button/<int:index>", methods=["GET"])
-    def get_synth_button_setting_controller(index: int):
+    def get_synth_button_setting(index: int):
         setting = synth_button_setting_controller.get_synth_button_setting(index)
         if setting is None:
             return "", status.HTTP_404_NOT_FOUND

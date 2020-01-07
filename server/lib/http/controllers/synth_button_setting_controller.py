@@ -1,5 +1,6 @@
 from playhouse.shortcuts import update_model_from_dict
 from typing import Dict
+from typing import List
 from typing import Optional
 
 from lib.common import config
@@ -20,6 +21,18 @@ def get_synth_button_count() -> int:
     Currently we only have 16 synth buttons.
     """
     return 16
+
+
+def get_synth_button_settings() -> Optional[List[SynthButtonSetting]]:
+    """
+    Retrieves all SynthButtonSettings from the database. Note that this call
+    corresponds to calling a sequence of get_synth_button_setting, so that we
+    can construct each SynthButtonSetting if it does not yet exist.
+    """
+    buttons = []
+    for i in range(get_synth_button_count()):
+        buttons.append(get_synth_button_setting(i))
+    return buttons
 
 
 def get_synth_button_setting(index: int) -> Optional[SynthButtonSetting]:

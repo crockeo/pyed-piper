@@ -5,10 +5,10 @@ import logo from "../res/logo.svg";
 import "../styles/App.scss";
 
 import AddSample from "./AddSample";
-import PlayButton from "./PlayButton";
+import SynthButton from "./SynthButton";
 
-import { SERVER_URI, GET_SAMPLES_URI } from "../consts";
-import { IWavFile } from "../types";
+import { SERVER_URI, GET_BUTTONS_URI, GET_SAMPLES_URI } from "../consts";
+import { IWavFile, ISynthButtonSetting } from "../types";
 
 interface IAppProps {
   children?: React.ReactChildren;
@@ -17,6 +17,7 @@ interface IAppProps {
 interface IAppState {
   error: string | null;
   mode: "loading" | "ready" | "failed";
+  synthButtonSettings: Array<ISynthButtonSetting>;
   wavFiles: Array<IWavFile>;
 }
 
@@ -27,17 +28,17 @@ class App extends React.Component<IAppProps, IAppState> {
     this.state = {
       error: null,
       mode: "loading",
+      synthButtonSettings: [],
       wavFiles: []
     };
   }
 
   componentDidMount() {
-    axios
-      .get(SERVER_URI + GET_SAMPLES_URI)
+    Promise.all([axios.get(SERVER_URI + GET_BUTTONS_URI), axios.get(SERVER_URI + GET_SAMPLES_URI)])
       .then(res => {
         this.setState({
-          mode: "ready",
-          wavFiles: res.data
+          synthButtonSettings: res[0].data,
+          wavFiles: res[1].data
         });
       })
       .catch(err => {
@@ -56,23 +57,15 @@ class App extends React.Component<IAppProps, IAppState> {
           <span className="title">Pyed Piper</span>
         </div>
 
-        <AddSample />
-
-        <select>
-          {this.state.wavFiles.map((wavFile, i) => (
-            <option key={i} value={wavFile.id}>
-              {wavFile.name}
-            </option>
-          ))}
-        </select>
-
         <div className="body">
           <div className="button-grid">
-            {new Array(16).fill(0).map((_, i) => (
-              <div className="button-grid-entry" key={i}>
-                <PlayButton running={i % 2 === 0} />
-              </div>
+            {this.state.synthButtonSettings.map((synthButtonSetting, i) => (
+              <SynthButton setting={synthButtonSetting} wavFiles={this.state.wavFiles} key={i} />
             ))}
+          </div>
+
+          <div className="add-sample-container">
+            <AddSample />
           </div>
         </div>
       </div>

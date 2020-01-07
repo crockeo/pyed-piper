@@ -1,11 +1,9 @@
 @import "theme.scss";
 
 body {
+  color: $dark-text;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-    "Droid Sans", "Helvetica Neue", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: sans-serif;
 }
 
 code {
@@ -18,8 +16,9 @@ input[type="submit"] {
   border-radius: 4px;
   border-style: none;
   box-shadow: 0px 3px 0px $darkBackground;
-  color: #ffffff;
+  color: $text;
   font-size: 1rem;
+  font-weight: bold;
   margin-bottom: 3px;
   padding: 0.3rem 0.6rem;
   transition: background-color 0.15s;
@@ -42,4 +41,21 @@ button:active,
 input[type="submit"]:active {
   box-shadow: none;
   transform: translate(0, 3px);
+}
+
+input[type="text"],
+input[type="number"] {
+  border-color: $darkBackground;
+  border-radius: 4px;
+  border-style: solid;
+  border-width: 1px;
+  display: block;
+  font-size: 1rem;
+  padding: 0.2rem 0.5rem;
+}
+
+label {
+  color: $secondary-dark-text;
+  display: block;
+  margin: 0.5rem 0rem 0.2rem 0rem;
 }

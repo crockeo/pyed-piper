@@ -1,6 +1,8 @@
 $primaryColor: #ffe873;
 $secondaryColor: #4b8bbe;
 
-$textColor: #ffffff;
+$text: #ffffff;
+$dark-text: #333333;
+$secondary-dark-text: lighten($dark-text, 20%);
 
 $darkBackground: #182945;

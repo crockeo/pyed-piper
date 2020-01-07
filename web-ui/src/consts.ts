@@ -1,6 +1,7 @@
 export const SERVER_URI = "http://localhost:3001";
 
 export const GET_BUTTON_COUNT_URI = "/button/count";
+export const GET_BUTTONS_URI = "/buttons";
 export const GET_BUTTON_URI = "/button/{}";
 export const PUT_BUTTON_URI = "/button/{}";
 
