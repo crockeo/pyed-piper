@@ -100,7 +100,8 @@ def put_synth_button_setting(
         return None
 
     if (
-        "wav_id" in new_fields
+        new_fields.get("mode") == SynthButtonMode.Wav.value
+        and "wav_id" in new_fields
         and len(WavFile.select().where(WavFile.id == new_fields["wav_id"])) == 0
     ):
         return None

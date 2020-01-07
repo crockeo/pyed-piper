@@ -1,3 +1,4 @@
+import _ from "lodash";
 import React from "react";
 
 import "../styles/SynthButton.scss";
@@ -8,6 +9,7 @@ import { ISynthButtonSetting, IWavFile } from "../types";
 
 interface ISynthButtonProps {
   children?: React.ReactChildren;
+  onSettingUpdate: (setting: ISynthButtonSetting) => any;
   setting: ISynthButtonSetting;
   wavFiles: IWavFile[];
 }
@@ -25,17 +27,32 @@ class SynthButton extends React.Component<ISynthButtonProps, ISynthButtonState> 
     };
   }
 
-  _setMode(mode: string) {
-    if (mode !== "tone" && mode !== "wav") {
-      throw new Error(`Invalid mode "${mode}"`);
-    }
+  _debouncedOnSettingUpdate = _.debounce(this.props.onSettingUpdate, 500);
 
-    this.setState(prevState => ({
-      localSetting: {
-        ...prevState.localSetting,
-        mode: mode
-      }
-    }));
+  _setLocalSettingField<T>(field: keyof ISynthButtonSetting) {
+    return (event: React.SyntheticEvent<HTMLInputElement | HTMLSelectElement>) => {
+      event.persist();
+
+      this.setState(
+        prevState => {
+          const state = {
+            localSetting: {
+              ...prevState.localSetting
+            }
+          };
+
+          // @ts-ignore
+          state.localSetting[field] = event.target.value;
+
+          return state;
+        },
+        () => {
+          if (field !== "mode") {
+            this._debouncedOnSettingUpdate(this.state.localSetting);
+          }
+        }
+      );
+    };
   }
 
   getMode() {
@@ -52,14 +69,19 @@ class SynthButton extends React.Component<ISynthButtonProps, ISynthButtonState> 
     return (
       <div className="synth-button">
         <div className="synth-button-name">Button {this.state.localSetting.index}</div>
-        <select onChange={evt => this._setMode(evt.target.value)} value={this.state.localSetting.mode}>
+        <select onChange={this._setLocalSettingField("mode")} value={this.state.localSetting.mode}>
           <option value="tone">Tone</option>
           <option value="wav">Wav</option>
         </select>
 
         <div>
           <label>Linger Time</label>
-          <input type="number" placeholder="Linger Time" value={this.state.localSetting.linger_time} />
+          <input
+            type="number"
+            placeholder="Linger Time"
+            onChange={this._setLocalSettingField("linger_time")}
+            value={this.state.localSetting.linger_time}
+          />
         </div>
 
         {this.getMode()}
@@ -73,10 +95,20 @@ class SynthButton extends React.Component<ISynthButtonProps, ISynthButtonState> 
         <div className="config-header">Tone Config</div>
 
         <label>Frequency</label>
-        <input type="number" placeholder="Frequency" value={this.state.localSetting.frequency || undefined} />
+        <input
+          type="number"
+          placeholder="Frequency"
+          onChange={this._setLocalSettingField("frequency")}
+          value={this.state.localSetting.frequency || undefined}
+        />
 
         <label>Overtones</label>
-        <input type="number" placeholder="Overtones" value={this.state.localSetting.overtones || undefined} />
+        <input
+          type="number"
+          placeholder="Overtones"
+          onChange={this._setLocalSettingField("overtones")}
+          value={this.state.localSetting.overtones || undefined}
+        />
       </div>
     );
   }

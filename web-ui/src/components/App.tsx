@@ -7,7 +7,7 @@ import "../styles/App.scss";
 import AddSample from "./AddSample";
 import SynthButton from "./SynthButton";
 
-import { SERVER_URI, GET_BUTTONS_URI, GET_SAMPLES_URI } from "../consts";
+import { SERVER_URI, GET_BUTTONS_URI, GET_SAMPLES_URI, make_put_button_uri } from "../consts";
 import { IWavFile, ISynthButtonSetting } from "../types";
 
 interface IAppProps {
@@ -49,6 +49,23 @@ class App extends React.Component<IAppProps, IAppState> {
       });
   }
 
+  _onSynthButtonSettingUpdate(index: number) {
+    return (setting: ISynthButtonSetting) => {
+      axios
+        .put(make_put_button_uri(index), setting, {
+          headers: {
+            content_type: "application/json"
+          }
+        })
+        .then(res => {
+          // TODO
+        })
+        .catch(err => {
+          // TODO
+        });
+    };
+  }
+
   render() {
     return (
       <div className="App">
@@ -60,7 +77,12 @@ class App extends React.Component<IAppProps, IAppState> {
         <div className="body">
           <div className="button-grid">
             {this.state.synthButtonSettings.map((synthButtonSetting, i) => (
-              <SynthButton setting={synthButtonSetting} wavFiles={this.state.wavFiles} key={i} />
+              <SynthButton
+                onSettingUpdate={this._onSynthButtonSettingUpdate(i)}
+                setting={synthButtonSetting}
+                wavFiles={this.state.wavFiles}
+                key={i}
+              />
             ))}
           </div>
 
