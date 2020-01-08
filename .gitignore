@@ -18,5 +18,5 @@ pyed-piper.db
 pyed-piper.db-shm
 pyed-piper.db-wal
 
-# Root level resources for the server
+# Ignore the resources produced by posting .wav files
 res/
