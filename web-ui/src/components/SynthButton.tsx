@@ -57,12 +57,18 @@ class SynthButton extends React.Component<ISynthButtonProps, ISynthButtonState> 
       this.setState(
         prevState => _.set(prevState, ["localSetting", field], value),
         () => {
-          if (field !== "mode") {
+          if (this._isValidUpdate(field, value)) {
             this._debouncedOnSettingUpdate(this.state.localSetting);
+          } else {
+            this._debouncedOnSettingUpdate.cancel();
           }
         }
       );
     };
+  }
+
+  _isValidUpdate(field: keyof ISynthButtonSetting, value: string | number): boolean {
+    return !(field === "mode" || value === 0 || value === "" || (typeof value === "number" && isNaN(value)));
   }
 
   _renderNumber(n: number): string {
@@ -97,6 +103,7 @@ class SynthButton extends React.Component<ISynthButtonProps, ISynthButtonState> 
           <input
             type="number"
             placeholder="Linger Time"
+            min="0.001"
             onChange={this._setLocalSettingField("linger_time")}
             value={this._renderNumber(this.state.localSetting.linger_time)}
           />
@@ -116,6 +123,7 @@ class SynthButton extends React.Component<ISynthButtonProps, ISynthButtonState> 
         <input
           type="number"
           placeholder="Frequency"
+          min="0"
           onChange={this._setLocalSettingField("frequency")}
           value={this._renderNumber(this.state.localSetting.frequency || NaN)}
         />
@@ -124,6 +132,7 @@ class SynthButton extends React.Component<ISynthButtonProps, ISynthButtonState> 
         <input
           type="number"
           placeholder="Overtones"
+          min="1"
           onChange={this._setLocalSettingField("overtones")}
           value={this._renderNumber(this.state.localSetting.overtones || NaN)}
         />
