@@ -62,23 +62,91 @@ $ sudo python3 main.py
 
 ### Music Synthesis
 
-TODO
+Press buttons! On a QWERTY keyboard, bound to 1-8, and q-i. Wooh
 
 ### HTTP API
 
-TODO
+#### Buttons
+
+- `GET`: `/button/count`
+
+  Arguments: None
+
+  Returns: `int`, count of buttons on the synth. Hard coded to `16` for now.
+
+- `GET`: `/buttons`
+
+  Arguments: None
+
+  Returns: `Array` of `SynthButtonSetting`s, each in the form:
+
+  ```json
+  {
+      "index": int,
+      "mode": string ("tone" or "wav"),
+      "linger_time": float,
+
+      "frequency": float,
+      "overtones": int,
+
+      "wav_id": string
+  }
+  ```
+
+- `GET`: `/button/<int:index>`
+
+  Arguments: `int` index
+
+  Returns: A single `SynthButtonSetting`, as described above.
+
+- `PUT`: `/button/<int:index>`
+
+  Arguments: Single `SynthButtonSetting`, in the form above, as the body of the message.
+
+  Returns: The same `SynthButtonSetting` as processed by the server.
+
+#### Samples
+
+- `GET`: `/samples`
+
+  Arguments: none
+
+  Returns: An `Array` of `WavFile`s, in the form:
+
+  ```json
+  {
+    "id": string,
+    "path": string,
+    "name": string
+  }
+  ```
+
+- `GET`: `/sample/id`
+
+  Arguments: `str` id
+
+  Returns: A single `WavFile`, as described above.
+
+- `POST`: `/sample`
+
+  Arguments: A blob of type `audio/wav`
+
+  Returns: A single `WavFile`, corresponding to the entry made in the database associated with the blob data.
 
 ## Web UI
 
-TODO
+This is a Node.js part of the project, meant to be hosted on the Raspberry Pi to configure the synth by connecting to the Pi in Access Point mode. You can also use it to configure the synth on the computer!
 
-### Installation
+### Installation / Usage
 
-TODO
+All of the following commands assume that you're in the `web-ui` directory. Ensure that you have [Node.js](https://nodejs.org/en/) and [NPM](https://www.npmjs.com/) installed.
 
-### Usage
+```bash
+$ npm install
+$ npm start
+```
 
-TODO
+If you want to package the project to be served by another web server... then DIY until I get to that part of the project.
 
 ## License
 
