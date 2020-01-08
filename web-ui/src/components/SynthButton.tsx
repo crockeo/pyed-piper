@@ -1,5 +1,5 @@
 import _ from "lodash";
-import React from "react";
+import React, { ChangeEvent } from "react";
 
 import "../styles/SynthButton.scss";
 
@@ -27,25 +27,35 @@ class SynthButton extends React.Component<ISynthButtonProps, ISynthButtonState> 
     };
   }
 
+  componentDidUpdate() {
+    // Whenever we receive an update from outside, override internal changes.
+    // Used to sync with the server, once we receive a reply from a PUT.
+    if (this.props.setting !== this.state.localSetting) {
+      this.setState({
+        localSetting: this.props.setting
+      });
+    }
+  }
+
+  // Used whenever we want to update the SynthButtonSetting that exists in the
+  // server.
   _debouncedOnSettingUpdate = _.debounce(this.props.onSettingUpdate, 500);
 
-  _setLocalSettingField<T>(field: keyof ISynthButtonSetting) {
-    return (event: React.SyntheticEvent<HTMLInputElement | HTMLSelectElement>) => {
+  _setLocalSettingField(field: keyof ISynthButtonSetting) {
+    return (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       event.persist();
 
+      let value: string | number = event.target.value;
+      if (typeof this.state.localSetting[field] === "number") {
+        value = Number.parseFloat(value);
+      }
+
+      if (value === this.state.localSetting[field]) {
+        return;
+      }
+
       this.setState(
-        prevState => {
-          const state = {
-            localSetting: {
-              ...prevState.localSetting
-            }
-          };
-
-          // @ts-ignore
-          state.localSetting[field] = event.target.value;
-
-          return state;
-        },
+        prevState => _.set(prevState, ["localSetting", field], value),
         () => {
           if (field !== "mode") {
             this._debouncedOnSettingUpdate(this.state.localSetting);
@@ -53,6 +63,14 @@ class SynthButton extends React.Component<ISynthButtonProps, ISynthButtonState> 
         }
       );
     };
+  }
+
+  _renderNumber(n: number): string {
+    if (isNaN(n)) {
+      return "";
+    }
+
+    return n.toString();
   }
 
   getMode() {
@@ -80,7 +98,7 @@ class SynthButton extends React.Component<ISynthButtonProps, ISynthButtonState> 
             type="number"
             placeholder="Linger Time"
             onChange={this._setLocalSettingField("linger_time")}
-            value={this.state.localSetting.linger_time}
+            value={this._renderNumber(this.state.localSetting.linger_time)}
           />
         </div>
 
@@ -99,7 +117,7 @@ class SynthButton extends React.Component<ISynthButtonProps, ISynthButtonState> 
           type="number"
           placeholder="Frequency"
           onChange={this._setLocalSettingField("frequency")}
-          value={this.state.localSetting.frequency || undefined}
+          value={this._renderNumber(this.state.localSetting.frequency || NaN)}
         />
 
         <label>Overtones</label>
@@ -107,7 +125,7 @@ class SynthButton extends React.Component<ISynthButtonProps, ISynthButtonState> 
           type="number"
           placeholder="Overtones"
           onChange={this._setLocalSettingField("overtones")}
-          value={this.state.localSetting.overtones || undefined}
+          value={this._renderNumber(this.state.localSetting.overtones || NaN)}
         />
       </div>
     );
@@ -118,7 +136,11 @@ class SynthButton extends React.Component<ISynthButtonProps, ISynthButtonState> 
       <div className="config-section">
         <div className="config-header">Wav Config</div>
 
-        <SampleSelector value={this.state.localSetting.wav_id || undefined} wavFiles={this.props.wavFiles} />
+        <SampleSelector
+          onChange={this._setLocalSettingField("wav_id")}
+          value={this.state.localSetting.wav_id || undefined}
+          wavFiles={this.props.wavFiles}
+        />
       </div>
     );
   }
