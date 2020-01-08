@@ -82,14 +82,14 @@ Press buttons! On a QWERTY keyboard, bound to 1-8, and q-i. Wooh
 
   ```json
   {
-      "index": int,
-      "mode": string ("tone" or "wav"),
-      "linger_time": float,
+    "index": "int",
+    "mode": "string ('tone' or 'wav')",
+    "linger_time": "float",
 
-      "frequency": float,
-      "overtones": int,
+    "frequency": "float",
+    "overtones": "int",
 
-      "wav_id": string
+    "wav_id": "string"
   }
   ```
 
@@ -115,9 +115,9 @@ Press buttons! On a QWERTY keyboard, bound to 1-8, and q-i. Wooh
 
   ```json
   {
-    "id": string,
-    "path": string,
-    "name": string
+    "id": "string",
+    "path": "string",
+    "name": "string"
   }
   ```
 
